@@ -16,7 +16,7 @@ public class MainOutputInReverseV1 {
 
         ListIterator<Integer> iterator = evaluations.listIterator(evaluations.size());
         while (iterator.hasPrevious()) {
-            System.out.print(iterator.previous() + ", ");
+            System.out.print(iterator.previous() + " ");
         }
     }
 }

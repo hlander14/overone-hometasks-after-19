@@ -15,7 +15,7 @@ public class MainOutputReverseV2 {
 
         Object[] evaluationsInString = evaluations.toArray();
         for (int i = evaluationsInString.length - 1; i >= 0; i--) {
-            System.out.print(evaluationsInString[i] + ", ");
+            System.out.print(evaluationsInString[i] + " ");
         }
     }
 }
