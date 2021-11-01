@@ -17,7 +17,5 @@ public class MainOutputReverseV2 {
         for (int i = evaluationsInString.length - 1; i >= 0; i--) {
             System.out.print(evaluationsInString[i] + " ");
         }
-
-        System.out.println(evaluations);
     }
 }
