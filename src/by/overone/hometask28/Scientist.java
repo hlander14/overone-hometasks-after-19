@@ -41,7 +41,7 @@ public class Scientist implements Runnable {
             counter++;
         }
         while (!dump.removeDetails(robotPartsHashMap)) {
-//            System.err.println("Do not add parts from factory to dump");
+            System.err.println("Do not add parts from factory to dump");
         }
 
         for (RobotParts robotParts : robotPartsHashMap.keySet()) {

@@ -36,7 +36,7 @@ public class Factory implements Runnable {
         }
 
         while (!dump.addDetails(robotPartsHashMap)) {
-//            System.err.println("Do not add parts from factory to dump");
+            System.err.println("Do not add parts from factory to dump");
         }
     }
 
