@@ -1,4 +1,4 @@
-package by.overone.lesson31.entity;
+package by.overone.hometask31.entity;
 
 import java.util.Objects;
 

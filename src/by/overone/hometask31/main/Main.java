@@ -1,6 +1,6 @@
-package by.overone.lesson31.main;
+package by.overone.hometask31.main;
 
-import by.overone.lesson31.controller.BookController;
+import by.overone.hometask31.controller.BookController;
 
 public class Main {
     public static void main(String[] args) {
