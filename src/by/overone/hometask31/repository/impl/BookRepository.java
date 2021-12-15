@@ -8,17 +8,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BookRepository implements IBookRepository {
-    String driverSQL = "com.mysql.cj.jdbc.Driver";
-    String url = "jdbc:mysql://localhost:3306/book_schema";
-    String username = "user";
-    String password = "123";
+    public static final String DRIVER_SQL = "com.mysql.cj.jdbc.Driver";
+    public static final String URL = "jdbc:mysql://localhost:3306/book_schema";
+    public static final String USERNAME = "user";
+    public static final String PASSWORD = "123";
 
     @Override
     public List<Book> readAll() {
+        Connection connection = null;
         List<Book> books = new ArrayList<>();
         try {
-            Class.forName(driverSQL);
-            Connection connection = DriverManager.getConnection(url, username, password);
+            Class.forName(DRIVER_SQL);
+            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
             Statement statement = connection.createStatement();
 
             ResultSet resultSet = statement.executeQuery("SELECT * FROM book_schema.books");
@@ -29,19 +30,27 @@ public class BookRepository implements IBookRepository {
                 Long quantity = Long.valueOf(resultSet.getString(4));
                 books.add(new Book(bookId, title, author, quantity));
             }
-            connection.close();
+
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                assert connection != null;
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return books;
     }
 
     @Override
     public List<Book> readByAuthor(String authorName) {
+        Connection connection = null;
         List<Book> books = new ArrayList<>();
         try {
-            Class.forName(driverSQL);
-            Connection connection = DriverManager.getConnection(url, username, password);
+            Class.forName(DRIVER_SQL);
+            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
 
             PreparedStatement preparedStatement =
                     connection.prepareStatement("SELECT * FROM book_schema.books WHERE author = ?");
@@ -54,58 +63,118 @@ public class BookRepository implements IBookRepository {
                 Long quantity = Long.valueOf(resultSet.getString(4));
                 books.add(new Book(bookId, title, author, quantity));
             }
-            connection.close();
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                assert connection != null;
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return books;
     }
 
     @Override
-    public boolean addBook(Book bookToAdd) {
+    public Book readByID(int idOfBook) {
+        Connection connection = null;
+        Book bookByID = null;
         try {
-            Class.forName(driverSQL);
-            Connection connection = DriverManager.getConnection(url, username, password);
+            Class.forName(DRIVER_SQL);
+            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
 
-            String sqlString = "INSERT INTO book_schema.books (id, title, author, quantity) VALUES (?, ?, ?, ?)";
             PreparedStatement preparedStatement =
-                    connection.prepareStatement(sqlString);
-            preparedStatement.setInt(1, bookToAdd.getId().intValue());
-            preparedStatement.setString(2, bookToAdd.getTitle());
-            preparedStatement.setString(3, bookToAdd.getAuthor());
-            preparedStatement.setInt(4, bookToAdd.getQuantity().intValue());
-            preparedStatement.execute();
-            connection.close();
-            return true;
+                    connection.prepareStatement("SELECT * FROM book_schema.books WHERE id = ?");
+            preparedStatement.setInt(1, idOfBook);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                Long bookId = Long.valueOf(resultSet.getString(1));
+                String title = resultSet.getString(2);
+                String author = resultSet.getString(3);
+                Long quantity = Long.valueOf(resultSet.getString(4));
+                bookByID = new Book(bookId, title, author, quantity);
+            }
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                assert connection != null;
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
-        return false;
+        return bookByID;
     }
 
     @Override
-    public void deleteBook(int idFromDelete) {
+    public int addBook(Book bookToAdd) {
+        Connection connection = null;
         try {
-            Class.forName(driverSQL);
-            Connection connection = DriverManager.getConnection(url, username, password);
+            Class.forName(DRIVER_SQL);
+            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+
+            String sqlString = "INSERT INTO book_schema.books (title, author, quantity) VALUES (?, ?, ?)";
+            String[] columnNames = new String[] { "id" };
+            PreparedStatement preparedStatement =
+                    connection.prepareStatement(sqlString, columnNames);
+            preparedStatement.setString(1, bookToAdd.getTitle());
+            preparedStatement.setString(2, bookToAdd.getAuthor());
+            preparedStatement.setInt(3, bookToAdd.getQuantity().intValue());
+
+            if (preparedStatement.executeUpdate() > 0) {
+                ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+                if ( generatedKeys.next() ) {
+                    return generatedKeys.getInt(1);
+                }
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                assert connection != null;
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return -1;
+    }
+
+    @Override
+    public boolean deleteBook(int idFromDelete) {
+        Connection connection = null;
+        boolean flagCorrectEnd = false;
+        try {
+            Class.forName(DRIVER_SQL);
+            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
 
             String sqlString = "DELETE FROM book_schema.books WHERE id=?";
             PreparedStatement preparedStatement =
                     connection.prepareStatement(sqlString);
             preparedStatement.setInt(1, idFromDelete);
-            preparedStatement.execute();
-            connection.close();
+            flagCorrectEnd = preparedStatement.execute();
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                assert connection != null;
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
+        return flagCorrectEnd;
     }
 
     @Override
-    public void updateBook(Book bookToUpdate) {
+    public boolean updateBook(Book bookToUpdate) {
+        Connection connection = null;
+        boolean flagCorrectEnd = false;
         try {
-            Class.forName(driverSQL);
-            Connection connection = DriverManager.getConnection(url, username, password);
-
+            Class.forName(DRIVER_SQL);
+            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
             String sqlString = "UPDATE book_schema.books SET title = ?, author = ?, quantity = ? WHERE id = ?";
             PreparedStatement preparedStatement =
                     connection.prepareStatement(sqlString);
@@ -114,9 +183,17 @@ public class BookRepository implements IBookRepository {
             preparedStatement.setInt(3, bookToUpdate.getQuantity().intValue());
             preparedStatement.setInt(4, bookToUpdate.getId().intValue());
             preparedStatement.execute();
-            connection.close();
+            flagCorrectEnd = true;
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                assert connection != null;
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
+        return flagCorrectEnd;
     }
 }

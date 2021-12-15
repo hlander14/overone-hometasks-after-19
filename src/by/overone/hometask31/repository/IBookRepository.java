@@ -9,9 +9,11 @@ public interface IBookRepository {
 
     List<Book> readByAuthor(String authorName);
 
-    boolean addBook(Book book);
+    Book readByID(int idOfBook);
 
-    void deleteBook(int idFromDelete);
+    int addBook(Book book);
 
-    void updateBook(Book bookToUpdate);
+    boolean deleteBook(int idFromDelete);
+
+    boolean updateBook(Book bookToUpdate);
 }

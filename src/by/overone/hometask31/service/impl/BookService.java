@@ -27,17 +27,30 @@ public class BookService implements IBookService {
     }
 
     @Override
-    public boolean addBook(Book book) {
-        return bookRepository.addBook(book);
+    public Book readByID(int idOfBook) {
+        return bookRepository.readByID(idOfBook);
     }
 
     @Override
-    public void deleteBook(int idFromDelete) {
-        bookRepository.deleteBook(idFromDelete);
+    public Book addBook(Book book) {
+        int returnedID;
+        Book bookById = null;
+        if ((returnedID = bookRepository.addBook(book)) != -1) {
+            bookById = bookRepository.readByID(returnedID);
+            if (bookById != null) {
+                return bookById;
+            }
+        }
+        return new Book(-1L, "", "", 0L);
     }
 
     @Override
-    public void updateBook(Book bookToUpdate) {
-        bookRepository.updateBook(bookToUpdate);
+    public boolean deleteBook(int idFromDelete) {
+        return bookRepository.deleteBook(idFromDelete);
+    }
+
+    @Override
+    public boolean updateBook(Book bookToUpdate) {
+        return bookRepository.updateBook(bookToUpdate);
     }
 }

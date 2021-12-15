@@ -9,9 +9,11 @@ public interface IBookService {
 
     List<Book> readByAuthor(String authorName);
 
-    boolean addBook(Book book);
+    Book readByID(int idOfBook);
 
-    void deleteBook(int idFromDelete);
+    Book addBook(Book book);
 
-    void updateBook(Book bookToUpdate);
+    boolean deleteBook(int idFromDelete);
+
+    boolean updateBook(Book bookToUpdate);
 }
